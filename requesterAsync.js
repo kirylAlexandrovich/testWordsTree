@@ -15,10 +15,7 @@ const asyncRequester = async (root) => {
 
     if (resObj) {
         resObj.forEach((file) => {
-            if (file === 'file25.txt') return;
             asyncRequester(file);
         })
     }
 };
-
-asyncRequester('root.txt');

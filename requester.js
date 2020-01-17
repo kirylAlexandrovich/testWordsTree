@@ -23,5 +23,3 @@ function requester(root) {
         console.log(err);
     })
 }
-
-requester('root.txt');
