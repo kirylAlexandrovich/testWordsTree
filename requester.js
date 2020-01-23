@@ -1,25 +1,40 @@
 let result = '';
+let requestStack = [];
 
 function requester(root) {
-    fetch(`https://fe.it-academy.by/Examples/words_tree/${root}`)
+    return fetch(`https://fe.it-academy.by/Examples/words_tree/${root}`)
         .then(function (response) {
-            response.text()
-                .then(function (text) {
-                let resObj;
-                try {
-                    resObj = JSON.parse(text);
-                } catch (e) {
-                    result += text + ' ';
-                    console.log(result);
-                }
+            return response.text();
+        })
+        .then(function(text) {
+            try {
+                const fileData = JSON.parse(text);
+                const nextFile = fileData.shift();
 
-                if (resObj) {
-                    resObj.forEach((file) => {
-                        requester(file);
-                    })
+                requestStack = requestStack.concat(fileData.reverse());
+                return requester(nextFile);
+            }
+            catch(e) {
+                if(e.name === 'SyntaxError') {
+                    result += text + ' ';
                 }
-            });
-        }).catch(function (err) {
-        console.log(err);
-    })
+            }
+        })
+        .then(() => {
+            if(requestStack.length) {
+                return requester(requestStack.pop());
+            }
+
+            return result;
+        })
+        .catch((e) => {
+            console.log(e);
+        })
+
+}
+
+function startRequester () {
+    requester('root.txt').then(() => {
+    console.log(result);
+});
 }
